@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
-import math
 
 
 class AddProductionItem(models.TransientModel):
     _name = 'wiz.add.production.item'
     _description = 'Add Production Item'
+
+    @api.model
+    def _default_production_id(self):
+        return self.env.context.get('active_id', False)
 
     product_id = fields.Many2one('product.product', 'Product', required=True)
     product_qty = fields.Float(
@@ -16,8 +19,8 @@ class AddProductionItem(models.TransientModel):
         required=True,
         default=1.0)
     production_id = fields.Many2one(
-        'mrp.production', 'Production Order', select=True,
-        default=lambda self: self.env.context.get('active_id', False))
+        'mrp.production', 'Production Order',
+        default=_default_production_id)
 
     @api.multi
     def add_item(self):
